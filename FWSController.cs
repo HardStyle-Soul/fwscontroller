@@ -7,7 +7,7 @@ using Oxide.Core.Libraries.Covalence;
 
 namespace Oxide.Plugins
 {
-    [Info("FWSController", "HardStyle", "1.1.0")]
+    [Info("FWSController", "HardStyle", "1.1.1")]
     [Description("Automated firework shows with RF triggers")]
     public class FWSController : RustPlugin
     {
@@ -473,8 +473,17 @@ namespace Oxide.Plugins
                 if (!IsAllowedPowerSource(source))
                     continue;
 
-                try { sw.SetSwitch(true); }
-                catch { sw.SetFlag(BaseEntity.Flags.On, true); }
+                try
+                {
+                    sw.SetSwitch(true);
+                }
+                catch
+                {
+                    using (var setFlags = sw.StartSetFlags(BaseEntity.FlagsUpdateMode.SendNetworkUpdate_Flags))
+                    {
+                        setFlags.Set(BaseEntity.Flags.On, true);
+                    }
+                }
 
                 sw.SendNetworkUpdateImmediate();
             }
